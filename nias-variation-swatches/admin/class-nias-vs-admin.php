@@ -237,4 +237,23 @@ class Nias_Vs_Admin {
             update_term_meta( $term_id, 'nias_vs_color', $color );
         }
     }
+
+    /**
+     * Dynamically adds hooks for attribute term fields.
+     * This is hooked into 'admin_init' to ensure WC functions are available.
+     *
+     * @since    1.0.0
+     */
+    public function add_dynamic_term_hooks() {
+        $attribute_taxonomies = wc_get_attribute_taxonomies();
+        if ( empty( $attribute_taxonomies ) ) {
+            return;
+        }
+
+        foreach ( $attribute_taxonomies as $tax ) {
+            $taxonomy_name = wc_attribute_taxonomy_name( $tax->attribute_name );
+            add_action( "{$taxonomy_name}_add_form_fields", array( $this, 'add_term_fields' ), 10, 1 );
+            add_action( "{$taxonomy_name}_edit_form_fields", array( $this, 'edit_term_fields' ), 10, 2 );
+        }
+    }
 }

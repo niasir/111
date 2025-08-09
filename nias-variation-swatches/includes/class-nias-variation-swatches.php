@@ -177,17 +177,12 @@ class Nias_Variation_Swatches {
         $this->loader->add_action( 'woocommerce_attribute_added', $plugin_admin, 'save_attribute_fields', 10, 2 );
         $this->loader->add_action( 'woocommerce_attribute_updated', $plugin_admin, 'save_attribute_fields', 10, 2 );
 
-        // Hooks for custom term meta fields
-        $attribute_taxonomies = wc_get_attribute_taxonomies();
-        if ( ! empty( $attribute_taxonomies ) ) {
-            foreach ( $attribute_taxonomies as $tax ) {
-                $taxonomy_name = wc_attribute_taxonomy_name( $tax->attribute_name );
-                $this->loader->add_action( "{$taxonomy_name}_add_form_fields", $plugin_admin, 'add_term_fields', 10, 1 );
-                $this->loader->add_action( "{$taxonomy_name}_edit_form_fields", $plugin_admin, 'edit_term_fields', 10, 2 );
-            }
-        }
+        // Hooks for saving term meta. These are safe to add directly.
         $this->loader->add_action( 'created_term', $plugin_admin, 'save_term_fields', 10, 1 );
         $this->loader->add_action( 'edited_term', $plugin_admin, 'save_term_fields', 10, 1 );
+
+        // Hook for dynamically adding the term fields. This is deferred until admin_init.
+        $this->loader->add_action( 'admin_init', $plugin_admin, 'add_dynamic_term_hooks' );
 
     }
 
